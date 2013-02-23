@@ -36,8 +36,13 @@ namespace Aftermath {
             if (seqType.IsArray)
                 return typeof (IEnumerable<>).MakeGenericType(seqType.GetElementType());
             if (seqType.IsGenericType) {
-                foreach (var ienum in seqType.GetGenericArguments().Select(arg => typeof (IEnumerable<>).MakeGenericType(arg)).Where(ienum => ienum.IsAssignableFrom(seqType)))
-                    return ienum;
+                var ienumGeneric = seqType.GetGenericArguments()
+                    .Select(arg => typeof(IEnumerable<>).MakeGenericType(arg))
+                    .FirstOrDefault(seqType.IsAssignableTo);
+
+                if (ienumGeneric != null)
+                    return ienumGeneric;
+
             }
 
 

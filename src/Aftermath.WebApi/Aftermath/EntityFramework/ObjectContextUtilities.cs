@@ -117,23 +117,15 @@ namespace Aftermath.EntityFramework {
             var stateEntry = objectContext.ObjectStateManager.GetObjectStateEntry(current);
             stateEntry.ApplyOriginalValues(original);
 
-            // For any members that don't have RoundtripOriginal applied, EF can't determine modification
-            // state by doing value comparisons. To avoid losing updates in these cases, we must explicitly
-            // mark such members as modified.
-            var properties = TypeDescriptor.GetProperties(typeof (TEntity));
-            var attributes = TypeDescriptor.GetAttributes(typeof (TEntity));
-            var isRoundtripType = attributes[typeof (RoundtripOriginalAttribute)] != null;
-            foreach (var fieldMetadata in stateEntry.CurrentValues.DataRecordInfo.FieldMetadata) {
-                var memberName = stateEntry.CurrentValues.GetName(fieldMetadata.Ordinal);
-                var property = properties[memberName];
-                // TODO: below we need to replace ExcludeAttribute logic with corresponding
-                // DataContractMember/IgnoreDataMember logic
-                if (property != null &&
-                    (property.Attributes[typeof (RoundtripOriginalAttribute)] == null && !isRoundtripType)
-                    /* && property.Attributes[typeof(ExcludeAttribute)] == null */)
-                    stateEntry.SetModifiedProperty(memberName);
-            }
-
+            stateEntry.CurrentValues.DataRecordInfo.FieldMetadata
+                      .Join(typeof (TEntity).GetPropertyDescriptors(), 
+                            fieldMetadata => stateEntry.CurrentValues.GetName(fieldMetadata.Ordinal), 
+                            descriptor => descriptor.Name, 
+                            (metadata, descriptor) => descriptor)
+                      .Where(descriptor => descriptor != null)
+                      .Select(descriptor => descriptor.Name)
+                      .ForEach(stateEntry.SetModifiedProperty);
+       
             return stateEntry;
         }
     }

@@ -117,12 +117,6 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
-  <data name="ChangeSet_ChangeSetEntryNotFound" xml:space="preserve">
-    <value>The specified entity does not exist in the ChangeSet.</value>
-  </data>
-  <data name="ChangeSet_OriginalNotValidForInsert" xml:space="preserve">
-    <value>GetOriginal cannot be called for a new entity being inserted.</value>
-  </data>
   <data name="CyclicMetadataTypeAttributesFound" xml:space="preserve">
     <value>The MetadataTypeAttribute on type '{0}' results in a cyclic metadata provider chain. Either remove the attribute or remove the cycle.</value>
   </data>
@@ -137,36 +131,6 @@
   </data>
   <data name="DefaultCtorNotFound" xml:space="preserve">
     <value>The DbContext type '{0}' does not contain a parameterless constructor. A parameterless constructor is required to use EntityFramework in the Code-First mode with a DataController.</value>
-  </data>
-  <data name="InvalidAction_UnsupportedFilterType" xml:space="preserve">
-    <value>Action '{0}.{1}' has one or more filters applied that do not derive from AuthorizationFilterAttribute. Only authorization filters are supported on DataController Insert/Update/Delete actions.</value>
-  </data>
-  <data name="InvalidChangeSet" xml:space="preserve">
-    <value>Invalid ChangeSet: {0}</value>
-  </data>
-  <data name="InvalidChangeSet_AssociatedIdNotInChangeset" xml:space="preserve">
-    <value>Id '{0}' specified for association member '{0}.{1}' is invalid.</value>
-  </data>
-  <data name="InvalidChangeSet_AssociatedIdsCannotBeNull" xml:space="preserve">
-    <value>Associated Ids for member '{0}.{1}' cannot be null.</value>
-  </data>
-  <data name="InvalidChangeSet_DuplicateEntity" xml:space="preserve">
-    <value>Only one entry for a given entity instance can exist in the ChangeSet.</value>
-  </data>
-  <data name="InvalidChangeSet_DuplicateId" xml:space="preserve">
-    <value>Id must be unique for each entry.</value>
-  </data>
-  <data name="InvalidChangeSet_InsertsCantHaveOriginal" xml:space="preserve">
-    <value>OriginalEntity cannot be specified for an Insert operation.</value>
-  </data>
-  <data name="InvalidChangeSet_InvalidAssociationMember" xml:space="preserve">
-    <value>Association member '{0}.{1}' specified in the ChangeSet does not exist or is not marked with AssociationAttribute.</value>
-  </data>
-  <data name="InvalidChangeSet_MustBeSameType" xml:space="preserve">
-    <value>Entity and OriginalEntity must be of the same type.</value>
-  </data>
-  <data name="InvalidChangeSet_NullEntity" xml:space="preserve">
-    <value>Entity cannot be null.</value>
   </data>
   <data name="InvalidDbMetadataProviderSpecification" xml:space="preserve">
     <value>Type '{0}' is not a valid DbMetadataProviderAttribute parameter because it does not derive from DbContext.</value>

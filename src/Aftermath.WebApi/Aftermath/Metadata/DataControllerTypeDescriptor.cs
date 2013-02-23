@@ -59,8 +59,6 @@ namespace Aftermath.Metadata {
         private Attribute[] GetAdditionalAttributes(MemberDescriptor descriptor) {
             var additionalAttributes = new List<Attribute>();
 
-            if (ShouldAddRoundTripAttribute(descriptor, _foreignKeyMembers.Contains(descriptor.Name)))
-                additionalAttributes.Add(new RoundtripOriginalAttribute());
 
             bool allowInitialValue;
 
@@ -104,8 +102,7 @@ namespace Aftermath.Metadata {
         private static bool ShouldInferAttributes(MemberDescriptor descriptor, bool keyIsEditable, IEnumerable<string> foreignKeyMembers) {
             bool allowInitialValue;
 
-            return ShouldAddEditableFalseAttribute(descriptor, keyIsEditable, out allowInitialValue) ||
-                ShouldAddRoundTripAttribute(descriptor, foreignKeyMembers.Contains(descriptor.Name));
+            return ShouldAddEditableFalseAttribute(descriptor, keyIsEditable, out allowInitialValue);
         }
 
         /// <summary>
@@ -141,21 +138,6 @@ namespace Aftermath.Metadata {
             return false;
         }
 
-        /// <summary>
-        /// Returns true if the specified member requires a RoundTripOriginalAttribute
-        /// and one isn't already present.
-        /// </summary>
-        /// <param name="descriptor">The member to check.</param>
-        /// <param name="isFkMember">True if the member is a foreign key, false otherwise.</param>
-        /// <returns>True if RoundTripOriginalAttribute should be added, false otherwise.</returns>
-        private static bool ShouldAddRoundTripAttribute(MemberDescriptor descriptor, bool isFkMember) {
-            if (descriptor.Attributes[typeof (RoundtripOriginalAttribute)] != null || descriptor.Attributes[typeof (AssociationAttribute)] != null) {
-                // already has the attribute or is an association 
-                return false;
-            }
 
-            return isFkMember || descriptor.Attributes[typeof (ConcurrencyCheckAttribute)] != null ||
-                descriptor.Attributes[typeof (TimestampAttribute)] != null || descriptor.Attributes[typeof (KeyAttribute)] != null;
-        }
     }
 }

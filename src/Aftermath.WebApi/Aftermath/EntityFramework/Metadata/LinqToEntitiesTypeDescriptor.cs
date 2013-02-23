@@ -97,9 +97,7 @@ namespace Aftermath.EntityFramework.Metadata {
 
             var member = EdmType.Members.SingleOrDefault(p => p.Name == pd.Name) as EdmProperty;
             if (member != null) {
-                if (hasKeyAttribute) {
-                    // key members must always be roundtripped
-                    inferRoundtripOriginalAttribute = true;
+                if (hasKeyAttribute) {;
 
                     // key members that aren't also FK members are non-editable (but allow an initial value)
                     if (!_keyIsEditable) {
@@ -156,22 +154,12 @@ namespace Aftermath.EntityFramework.Metadata {
                 // All members marked with TimestampAttribute (inferred or explicit) need to
                 // have [Editable(false)] and [RoundtripOriginal] applied
                 if (hasTimestampAttribute) {
-                    inferRoundtripOriginalAttribute = true;
 
                     if (editableAttribute == null)
                         editableAttribute = new EditableAttribute(false);
                 }
 
-                // Add RTO to this member if required. If this type has a timestamp
-                // member that member should be the ONLY member we apply RTO to.
-                // Dont apply RTO if it is an association member.
-                var isForeignKeyMember = _foreignKeyMembers != null && _foreignKeyMembers.Contains(member);
-                if ((_timestampMember == null || _timestampMember == member) &&
-                    (inferRoundtripOriginalAttribute || isForeignKeyMember) &&
-                    pd.Attributes[typeof (AssociationAttribute)] == null) {
-                    if (pd.Attributes[typeof (RoundtripOriginalAttribute)] == null)
-                        attributes.Add(new RoundtripOriginalAttribute());
-                }
+           
             }
 
             // Add the Editable attribute if required

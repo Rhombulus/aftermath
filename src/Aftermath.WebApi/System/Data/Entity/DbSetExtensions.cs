@@ -1,13 +1,14 @@
-﻿using System.ComponentModel;
-using System.Data.Entity;
+using System.ComponentModel;
 using System.Data.Entity.Infrastructure;
+using Aftermath;
+using Aftermath.EntityFramework;
 
-namespace Aftermath.EntityFramework {
+namespace System.Data.Entity {
     /// <summary>
     /// DbContext extension methods
     /// </summary>
     [EditorBrowsable(EditorBrowsableState.Never)]
-    public static class DbContextExtensions {
+    internal static class DbSetExtensions {
         /// <summary>
         /// Extension method used to attach the specified entity as modified,
         /// with the specified original state.

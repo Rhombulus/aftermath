@@ -1,0 +1,31 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+
+  <PropertyGroup>
+    <CompileDependsOn>
+      $(CompileDependsOn);
+      CompileTypeScript;
+    </CompileDependsOn>
+  </PropertyGroup>
+
+  <PropertyGroup>
+    <TypeScriptBuildConfigurations Condition="'$(TypeScriptIncludeComments)' == 'true'">$(TypeScriptBuildConfigurations) --comments</TypeScriptBuildConfigurations>
+    <TypeScriptBuildConfigurations Condition="'$(TypeScriptGeneratesDeclarations)' == 'true'">$(TypeScriptBuildConfigurations) --declaration</TypeScriptBuildConfigurations>
+    <TypeScriptBuildConfigurations Condition="'$(TypeScriptModuleKind)' != ''">$(TypeScriptBuildConfigurations) --module $(TypeScriptModuleKind)</TypeScriptBuildConfigurations>
+    <TypeScriptBuildConfigurations Condition="'$(TypeScriptIncludeDefaultLib)' == 'true'">$(TypeScriptBuildConfigurations) --nolib</TypeScriptBuildConfigurations>
+    <TypeScriptBuildConfigurations Condition="'$(TypeScriptOutFile)' != ''">$(TypeScriptBuildConfigurations) --out $(OutputPath)\$(TypeScriptOutFile)</TypeScriptBuildConfigurations>
+    <TypeScriptBuildConfigurations Condition="'$(TypeScriptSourceMap)' == 'true'">$(TypeScriptBuildConfigurations) --sourcemap</TypeScriptBuildConfigurations>
+    <TypeScriptBuildConfigurations Condition="'$(TypeScriptTarget)' != ''">$(TypeScriptBuildConfigurations) --target $(TypeScriptTarget)</TypeScriptBuildConfigurations>
+    <TypeScriptBuildConfigurations Condition="'$(TypeScriptAdditionalFlags)' != ''">$(TypeScriptBuildConfigurations) $(TypeScriptAdditionalFlags)</TypeScriptBuildConfigurations>
+    <TypeScriptCompileOnSaveEnabled Condition="'$(TypeScriptEnableCompileOnSave)' != 'false'">true</TypeScriptCompileOnSaveEnabled>
+  </PropertyGroup>
+
+  <Target Name="CompileTypeScript">
+    <Message Text="Compiling TypeScript files to '&quot;$(TypeScriptOutFile)'&quot;" />
+    <Message Text="Executing tsc $(TypeScriptBuildConfigurations) @(TypeScriptCompile ->'&quot;%(fullpath)&quot;', ' ')" />
+    <Exec Command="tsc $(TypeScriptBuildConfigurations) @(TypeScriptCompile ->'&quot;%(fullpath)&quot;', ' ')" />
+  </Target>
+
+
+  
+</Project>

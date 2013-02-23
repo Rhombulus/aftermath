@@ -1,0 +1,19 @@
+module aftermath.expressions.operators {
+    var equal: BinaryOperator;
+    var notEqual: BinaryOperator;
+    var greaterThan: BinaryOperator;
+    var greaterThanEqual: BinaryOperator;
+    var lessThan: BinaryOperator;
+    var lessThanEqual: BinaryOperator;
+    var and: BinaryOperator;
+    var add: BinaryOperator;
+    var subtract: BinaryOperator;
+    var multiply: BinaryOperator;
+    var divide: BinaryOperator;
+    var modulo: BinaryOperator;
+    var distanceTo: BinaryOperator;
+    var contains: BinaryOperator;
+    var startsWith: BinaryOperator;
+    var endsWith: BinaryOperator;
+    var indexOf: BinaryOperator;
+}

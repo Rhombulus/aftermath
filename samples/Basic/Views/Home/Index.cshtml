@@ -1,0 +1,40 @@
+﻿<html>
+    <head>
+        @Styles.Render("~/Content/css")
+        @Scripts.Render("~/bundles/modernizr")
+    </head>
+    <body>
+        
+        <input data-bind="value: nameFilter, valueUpdate: 'keyup'" placeholder="filter names" />
+        <ul>
+            <!-- ko foreach:  filteredcompanies -->
+            
+            <li>
+                <strong data-bind="text: Name"></strong>
+            </li>
+
+            <!-- /ko -->
+        </ul>
+        
+        <ul>
+            <!-- ko foreach: companies -->
+            
+            <li data-bind="click: $parent.selectedCompany">
+                <strong data-bind="text: Name"></strong>
+                
+            </li>
+
+            <!-- /ko -->
+        </ul>
+        
+        <div data-bind="with: selectedCompany">
+            <ul data-bind="foreach: Departments">
+                <li data-bind="text: Name"></li>
+            </ul>
+        </div>
+        
+
+        @Scripts.Render("~/bundles/all")
+        <script src="~/Scripts/main.js" ></script>
+    </body>
+</html>

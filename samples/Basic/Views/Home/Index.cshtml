@@ -1,40 +1,27 @@
-﻿<html>
-    <head>
-        @Styles.Render("~/Content/css")
-        @Scripts.Render("~/bundles/modernizr")
-    </head>
-    <body>
-        
-        <input data-bind="value: nameFilter, valueUpdate: 'keyup'" placeholder="filter names" />
-        <ul>
-            <!-- ko foreach:  filteredcompanies -->
-            
-            <li>
-                <strong data-bind="text: Name"></strong>
-            </li>
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <title>Aftermath</title>
 
-            <!-- /ko -->
+    @Styles.Render("~/Content/css")
+</head>
+<body>
+
+    <input data-bind="value: nameFilter, valueUpdate: 'keyup'" placeholder="filter names" />
+    <ul data-bind="foreach: filteredcompanies">
+        <li data-bind="text: Name">
+    </ul>
+    <ul data-bind="foreach: companies">
+        <li data-bind="text: Name, click: $parent.selectedCompany">
+    </ul>
+
+    <div data-bind="with: selectedCompany">
+        <ul data-bind="foreach: Departments">
+            <li data-bind="text: Name">
         </ul>
-        
-        <ul>
-            <!-- ko foreach: companies -->
-            
-            <li data-bind="click: $parent.selectedCompany">
-                <strong data-bind="text: Name"></strong>
-                
-            </li>
+    </div>
 
-            <!-- /ko -->
-        </ul>
-        
-        <div data-bind="with: selectedCompany">
-            <ul data-bind="foreach: Departments">
-                <li data-bind="text: Name"></li>
-            </ul>
-        </div>
-        
 
-        @Scripts.Render("~/bundles/all")
-        <script src="~/Scripts/main.js" ></script>
-    </body>
+    @Scripts.Render("~/bundles/all")
+</body>
 </html>

@@ -20,8 +20,14 @@ var aftermath;
             };
             ConstantExpression.prototype.getQueryString = function () {
                 var val = aftermath.observability.getValue(this._value);
+                if(val === undefined) {
+                    return;
+                }
+                if(val === null) {
+                    return 'null';
+                }
                 if(aftermath.utils.isNumber(val)) {
-                    return val;
+                    return val.toString();
                 }
                 if(aftermath.utils.isGuid(val)) {
                     return 'guid\'' + val + '\'';
@@ -32,10 +38,7 @@ var aftermath;
                 if(val && aftermath.utils.isFunction(val.lat)) {
                     return 'POINT(' + val.lng() + ' ' + val.lat() + ')';
                 }
-                if(val) {
-                    return val;
-                }
-                return _super.prototype.getQueryString.call(this);
+                return val.toString();
             };
             ConstantExpression.prototype.isValid = function () {
                 var value = aftermath.observability.getValue(this._value);

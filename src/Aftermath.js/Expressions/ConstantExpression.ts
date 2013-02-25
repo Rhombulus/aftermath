@@ -3,7 +3,7 @@
 
 module aftermath.expressions {
 
-    
+
 
     export class ConstantExpression extends Expression {
         public _value;
@@ -18,8 +18,15 @@ module aftermath.expressions {
         }
         getQueryString(): string {
             var val = observability.getValue(this._value);
+
+            if (val === undefined) {
+                return;
+            }
+            if (val === null) {
+                return 'null';
+            }
             if (utils.isNumber(val)) {
-                return val;
+                return val.toString();
             }
             if (utils.isGuid(val)) {
                 return 'guid\'' + val + '\'';
@@ -30,11 +37,10 @@ module aftermath.expressions {
             if (val && utils.isFunction(val.lat)) {
                 return 'POINT(' + val.lng() + ' ' + val.lat() + ')';
             }
-            if (val) {
-                return val;
-            }
 
-            return super.getQueryString();
+            return val.toString();
+
+
         }
 
         isValid() {
@@ -44,6 +50,6 @@ module aftermath.expressions {
             return utils.hasValue(value);
         }
     }
-    
+
 
 }

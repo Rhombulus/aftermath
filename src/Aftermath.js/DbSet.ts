@@ -68,7 +68,7 @@ module aftermath {
 
         /** @expose */
         select(expressionSelector: (entity) => any): KnockoutComputed {
-            var entities = this.getEntities();
+            var entities = this.getEntities(); 
 
             return ko.computed({
                 read: () => entities().map(expressionSelector), //entities().  $.map(entities(), ent => expressionSelector(ent)),

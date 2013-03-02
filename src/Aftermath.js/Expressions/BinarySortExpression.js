@@ -8,23 +8,11 @@ var aftermath;
     (function (expressions) {
         var BinarySortExpression = (function (_super) {
             __extends(BinarySortExpression, _super);
-            function BinarySortExpression(firstBy, thenBy) {
-                        _super.call(this, thenBy);
-                this._firstBy = firstBy;
+            function BinarySortExpression() {
+                _super.apply(this, arguments);
+
             }
             BinarySortExpression.joinString = ', ';
-            BinarySortExpression.prototype.getFunction = function () {
-                var firstFunc = this._firstBy.getFunction();
-                var thenFunc = _super.prototype.getFunction.call(this);
-                return function (a, b) {
-                    return firstFunc(a, b) || thenFunc(a, b);
-                };
-            };
-            BinarySortExpression.prototype.getQueryString = function () {
-                var first = this._firstBy.getQueryString();
-                var second = _super.prototype.getQueryString.call(this);
-                return String.prototype.concat.call(first, first && second && BinarySortExpression.joinString, second);
-            };
             return BinarySortExpression;
         })(expressions.UnarySortExpression);
         expressions.BinarySortExpression = BinarySortExpression;        

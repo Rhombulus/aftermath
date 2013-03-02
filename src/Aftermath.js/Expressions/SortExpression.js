@@ -11,21 +11,14 @@ var aftermath;
             function SortExpression() {
                 _super.apply(this, arguments);
 
-                this.compareFunc = function (a, b) {
-                    if(+a && +b) {
-                        return a - b;
-                    }
-                    return String.prototype.localeCompare.call(a, b);
-                };
             }
             SortExpression.prototype.thenBy = function (operand) {
-                return new expressions.BinarySortExpression(this, operand);
             };
             SortExpression.prototype.getFunction = function () {
-                return function (a, b) {
-                    return 0;
-                };
             };
+            SortExpression.prototype.invoke = function (a, b) {
+            };
+            SortExpression.empty = new SortExpression();
             return SortExpression;
         })(expressions.Expression);
         expressions.SortExpression = SortExpression;        

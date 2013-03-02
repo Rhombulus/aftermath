@@ -1,11 +1,11 @@
 module aftermath.expressions.operators {
-    var equal: BinaryOperator;
-    var notEqual: BinaryOperator;
-    var greaterThan: BinaryOperator;
-    var greaterThanEqual: BinaryOperator;
-    var lessThan: BinaryOperator;
-    var lessThanEqual: BinaryOperator;
-    var and: BinaryOperator;
+    var equal: BinaryPredicateOperator;
+    var notEqual: BinaryPredicateOperator;
+    var greaterThan: BinaryPredicateOperator;
+    var greaterThanEqual: BinaryPredicateOperator;
+    var lessThan: BinaryPredicateOperator;
+    var lessThanEqual: BinaryPredicateOperator;
+    var and: BinaryPredicateOperator;
     var add: BinaryOperator;
     var subtract: BinaryOperator;
     var multiply: BinaryOperator;

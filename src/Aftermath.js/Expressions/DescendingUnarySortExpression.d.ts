@@ -1,6 +1,7 @@
 module aftermath.expressions {
     class DescendingUnarySortExpression extends UnarySortExpression {
-        public getFunction(): (a: any, b: any) => number;
+        constructor(orderBy: Expression);
+        public invoke(a, b): number;
         public getQueryString(): string;
     }
 }

@@ -5,37 +5,31 @@
 module aftermath {
 
     export class DbContext {
-        public _dbSets: { [entityType: string]: DbSource; } = {};
-        public _mappings: { [entityType: string]: Ctor0; } = {};
-        public _actions: {
-            [entityType: string]: {
-                [action: string]: {
-                    dataAccessor: (entity) => any;
-                    addressAccessor: (entity) => string;
-                };
-            };
-        } = {};
+        types: metadata.MetadataSet;
+        _dbSets: { [entityType: string]: DbSet; } = {};
+        _mappings: { [entityType: string]: Ctor0; } = {};
+
 
         /** @constructor */
-        constructor(public baseUrl: string, metadata: string) {
+        constructor(public baseUrl: string, metadataUri: string) {
             $.ajax({
-                url: metadata,
+                url: metadataUri,
                 dataType: 'json',
                 async: false,
-                success: aftermath.metadata.process
+                success: data => this.types = new metadata.MetadataSet(data)
             });
         }
 
         /** @expose */
-        defineAction(entityType: string, actionName: string, addressAccessor: (entity) => string, dataAccessor?: (entity) => any) {
-            var actionset = this._actions[entityType] = this._actions[entityType] || {};
+        defineAction(entityType: metadata.TypeMetadata, actionName: string, addressAccessor: (entity) => string, dataAccessor?: (entity) => any) {
+            
 
-            actionset[actionName] = { dataAccessor: dataAccessor, addressAccessor: addressAccessor };
+            entityType.actions[actionName] = { dataAccessor: dataAccessor, addressAccessor: addressAccessor };
         }
 
-        doAction(entity, entityType: string, actionName: string) {
+        doAction(entity, type: metadata.TypeMetadata, actionName: string) {
 
-            var options = this._actions[entityType][actionName];
+            var options = type.actions[actionName];
             var data = options.dataAccessor && options.dataAccessor(entity);
             var address = options.addressAccessor(entity);
             return dbDataProvider.action(this.baseUrl, address, data)
@@ -44,19 +38,12 @@ module aftermath {
                     result = result[0];
                     _normalizeNewtonsoftResult(result);
 
-                    entityType = result.type || entityType;
-
-                    if (!entityType) throw "Unable to determine entity type.";
 
 
-                    var entities = [];
-                    for (var i in result.entities) {
-                        entities.push(this.map(result.entities[i], entityType));
-                    }
+                    //var entities = result.entities.map(data => type.construct(this, data));
 
-                    return this.merge(entities, entityType);
-                })
-                .promise();
+                    return this.import(result.entities, type);
+                });
         }
 
         addMapping(entityType: string, entityCtor: Ctor0) {
@@ -64,132 +51,70 @@ module aftermath {
         }
 
         /** @expose */
-        getDbSet(entityType: string): DbSet;
-        getDbSet(entityType: { entityType: string; new (); }): DbSet;
-        getDbSet(entityType): DbSet {
-            return this._getDbSource(entityType);
+        getDbSet(entityType: string): DbSet {
+            var type = this.types.lookup(entityType);
+            return this._getDbSet(type);
         }
 
         /** @private */
-        _getDbSource(entityType): DbSource {
-            var type = entityType['entityType'];
-            if (type) {
-                this.addMapping(type, entityType);
-            } else {
-                type = entityType;
-            }
-
-            var operationName = metadata.getOperationName(type);
-            return this._dbSets[type] || (this._dbSets[type] = new DbSource(this, type, operationName));
+        _getDbSet(entityType: metadata.TypeMetadata): DbSet {
+            
+            return this._dbSets[entityType.name] || (this._dbSets[entityType.name] = new DbSet(this, entityType));
 
         }
 
 
-        load(operationName: string, filter: string, sort: string, entityType: string): JQueryPromise {
+        load(operationName: string, query: string, type: metadata.TypeMetadata): JQueryPromise {
 
-            return dbDataProvider.request(this.baseUrl, operationName, filter, sort)
+            return dbDataProvider.request(this.baseUrl, operationName, query)
                 .fail(console.error.bind(console))
                 .done(result => {
                     result = result[0];
                     _normalizeNewtonsoftResult(result);
 
-                    entityType = result.type || entityType;
-
-                    if (!entityType) throw "Unable to determine entity type.";
-
-
-                    var entities = [];
-                    for (var i in result.entities) {
-                        entities.push(this.map(result.entities[i], entityType));
-                    }
-
-                    return this.merge(entities, entityType);
+                    //var entities = result.entities.map(data => type.construct(this, data));
+                    return this.import(result.entities, type);
                 })
                 .promise();
 
         }
 
+   
 
 
+        import(entities: Object[], type: metadata.TypeMetadata): any[] {
 
-        merge(entities: Object[], entityType: string): any[] {
-
-            var flattenedEntities = {};
-
-            for (var i in entities) {
-                flatten(entities[i], entityType, flattenedEntities);
-            }
-
-
-            for (var type in flattenedEntities) {
-                this._getDbSource(type).importEntities(flattenedEntities[type]);
-            }
-
-            return this._dbSets[entityType].importEntities(entities);
+           
+            return this._getDbSet(type).importEntities(entities);
 
         }
 
-        map(data: any, entityType: string) {
+        //map(data: Object, type: metadata.TypeMetadata) {
+        //    var result = observability.map(data, entityType, this);
 
-            var result = observability.map(data, entityType, this);
+        //    if ((utils.isObject(data) && !(data && data['$values']))) {
+        //        var userCtor = this._mappings[entityType];
+        //        if (userCtor) {
 
-            if ((utils.isObject(data) && !(data && data['$values']))) {
-                var userCtor = this._mappings[entityType];
-                if (userCtor) {
+        //            userCtor.apply(result);
 
-                    userCtor.apply(result);
+        //        }
+        //    }
 
-                }
-            }
+        //    if (result) {
+        //        for (var actionName in this._actions[entityType]) {
+        //            //result[actionName] = () => this.doAction(result, entityType, actionName);
+        //            result[actionName] = this.doAction.bind(this, result, entityType, actionName);
+        //        }
+        //    }
 
-            if (result) {
-                for (var actionName in this._actions[entityType]) {
-                    //result[actionName] = () => this.doAction(result, entityType, actionName);
-                    result[actionName] = this.doAction.bind(this, result, entityType, actionName);
-                }
-            }
+        //    return result;
 
-            return result;
-
-        }
+        //}
 
     }
 
-    function flatten(entity: Object, entityType: string, flattenedEntities) {
-        //pull all of the nested entities off of 'entity' and into 'flattenedEntities.$type[]'
 
-
-        var properties = metadata.getProperties(entity, entityType, true);
-        for (var i in properties) {
-            var propertyInfo: FieldMetadata = properties[i];
-
-            var propertyValue = ko.utils.unwrapObservable(entity[propertyInfo.name]);
-
-            if (propertyValue && propertyInfo.association) { //navigation property
-                var associatedEntities = utils.isArray(propertyValue) ? propertyValue : [propertyValue];
-                var associatedEntityType = propertyInfo.type;
-
-
-                var outputArray = flattenedEntities[associatedEntityType] || (flattenedEntities[associatedEntityType] = []);
-                outputArray.done = {};
-                for (var j in associatedEntities) {
-
-
-                    var identity = __getIdentity(associatedEntities[j], associatedEntityType);
-
-                    if (!outputArray.done[identity]) {
-
-                        outputArray.done[identity] = outputArray.push(associatedEntities[j]);
-
-                        flatten(associatedEntities[j], associatedEntityType, flattenedEntities);
-                    }
-                }
-            }
-
-        }
-
-
-    }
     function _normalizeNewtonsoftResult(result) {
         if (result.entities && result.entities.length && result.entities[0]['$values']) {
             var genericType: string = result.entities[0]['$type'];

@@ -3,38 +3,30 @@
 
 
 module aftermath {
-    export class DbSource extends DbSet {
-        
-        _entities = ko.observableArray([]);
+    export class DbSet extends DbQuery {
 
-        
+        entities: KnockoutObservableArray;
+        dbContext: DbContext;
+        entityType: metadata.TypeMetadata;
         /**
          * @constructor
          */
-        constructor(public dbContext: DbContext, public entityType: string, public operationName: string) {
-            super();
-        }
-        
-         /** @expose */
-        getEntities() {
-            this.queryRemote(null, null);
-            return this._getEntities();
+        constructor(dbContext: DbContext, entityType: metadata.TypeMetadata) {
+            this.entities = ko.observableArray([]);
+            this.dbContext = dbContext;
+            this.entityType = entityType;
+
+            super(expressions.constant(this.entities), new DbQueryProvider());
         }
 
-        _getEntities(): KnockoutObservableArray {
-            return this._entities
+        //load(query: expressions.QueryExpression): JQueryPromise;
+        load(query: KnockoutObservableString) {
+            return ko.computed(() => this.loadRemote(observability.unwrap(query)));
         }
-         
-        /**
-         * @param {Object=} filter
-         * @param {Object=} sort
-         */
-        queryRemote(): JQueryPromise;
-        queryRemote(filter?: expressions.Expression, sort?: expressions.SortExpression): JQueryPromise;
-        queryRemote(filter?, sort?): JQueryPromise {
-            var $filter = filter && filter.getQueryString();
-            var $orderby = sort && sort.getQueryString();
-            return this.dbContext.load(this.operationName, $filter, $orderby, this.entityType);
+
+
+        loadRemote(query) {
+            return this.dbContext.load(this.entityType.operationName, query, this.entityType);
         }
 
         importEntities(entities: Object[]) {
@@ -42,48 +34,36 @@ module aftermath {
             var entitiesNewToEntitySet = [];
             // Re: indexToInsertClientEntities, by convention, _clientEntities are layed out as updated followed by
             // added entities.
-            var mergedLoadedEntities = $.map(entities, entity => this.importEntity(entity, entitiesNewToEntitySet));
+            var mergedLoadedEntities = entities.map(entity => this.importEntity(entity, entitiesNewToEntitySet));
 
             if (entitiesNewToEntitySet.length) {
-                var ents = this._entities;
-                ents.splice.apply(ents, [ents.peek().length, 0].concat(entitiesNewToEntitySet))
+                this.entities.splice.apply(this.entities, [this.entities.peek().length, 0].concat(entitiesNewToEntitySet))
 
             }
 
             return mergedLoadedEntities;
         }
         importEntity(entity, entitiesNewToEntitySet) {
-            var identity = __getIdentity(entity, this.entityType);
+            var identity = this.entityType.getIdentity(entity);
 
             var ents = observability.asArray(this._entities);
 
-            for (var index = 0; index < ents.length; index++) {
-                if (identity === __getIdentity(ents[index], this.entityType)) {
-                    break;
-                }
-            }
-                
-            if (index < ents.length) {
-                entity = this._merge(ents[index], entity);
-            } else {
-                var id = identity; // Ok to use this as an id, as this is a new, unmodified server entity.
-                
+            var match = ents.filter(e => this.entityType.getIdentity(e) == identity);
 
-                var assns = metadata.getAssociations(this.entityType);
-                for (var i in assns) {
-                    var prop: metadata.FieldMetadata = assns[i];
-                    var value = this.dbContext.getDbSet(prop.type).where(p => p(prop['association']['otherKey'][0]).equals(entity[prop['association']['thisKey'][0]])).getEntities();
-                    entity[prop.name] = value;
-                }
-      
-                entitiesNewToEntitySet.push(entity);
+
+            if (match) {
+                return this._merge(match[0], entity);
             }
+
+            //importing a new entity
+            entity = this.entityType.construct(this.dbContext, entity);
+
+            entitiesNewToEntitySet.push(entity);
+
             return entity;
         }
         _merge(entity, _new) {
-            //if (!this.isUpdated(entity)) { // Only merge entities without changes
             this._mergeObject(entity, _new, this.entityType);
-            //}
             return entity;
         }
 
@@ -102,10 +82,11 @@ module aftermath {
             }
         }
 
-        _mergeObject(obj, _new, type) {
+        _mergeObject(obj, _new, type: metadata.TypeMetadata) {
 
 
-            $.each(metadata.getProperties(_new, type, false), (index, prop) => {
+
+            type.getProperties(false).forEach(prop => {
                 var oldValue = observability.getProperty(obj, prop.name),
                     value = observability.getProperty(_new, prop.name);
                 if (oldValue !== value) {
@@ -116,78 +97,20 @@ module aftermath {
                                 this._mergeArray(oldValue, value, prop.type);
                             }
                             return;
-                        } else if (utils.isObject(oldValue)) {
-                            this._mergeObject(oldValue, value, prop.type);
-                            return;
-                        }
+                        } //else if (utils.isObject(oldValue)) {
+                        //    this._mergeObject(oldValue, value, prop.type);
+                        //    return;
+                        //}
                     }
                     //? this._setProperty(obj, type, prop.name, value);
                     observability.setProperty(obj, prop.name, value);
                 }
             });
         }
-        //_getEntityIndexFromIdentity(identity) {
-        //    var index = -1;
-        //    var ents = this._entities.peek();
-        //    for (var i = 0; i < ents.length; i++) {
-        //        if (ents[i].identity === identity) {
-        //            return i
-        //        }
-        //    }
-        //}
-        //_getEntityIdentity(entity) {
-        //    return __getIdentity(entity, this.entityType);
-        //}
+
     }
 
-    //TODO: put this somewhere better
-    export function __getIdentity(entity, entityType: string): string {
-        // Produce a unique identity string for the given entity, based on simple
-        // concatenation of key values.
-        var md = metadata.process(<string>entityType);
-        if (!md) {
-            throw "No metadata available for type '" + entityType + "'.  Register metadata using 'metadata(...)'.";
-        }
-        var keys = md.key;
-        if (!keys) {
-            throw "No key metadata specified for entity type '" + entityType + "'";
-        }
 
-        // optimize for the common single part key case
-        if (keys.length == 1 && (keys[0].indexOf('.') == -1)) {
-            var keyMember = keys[0];
-            validateKeyMember(keyMember, keyMember, entity, entityType);
-
-            //TomMod - begin
-            //return observability.getProperty(entity, keyMember).toString();
-            var prop = observability.getProperty(entity, keyMember); //FIX
-            return prop ? prop.toString() : '';
-            //TomMod - end
-        }
-
-        var identity = "";
-        $.each(keys, function (index, key) {
-            if (identity.length > 0) {
-                identity += ",";
-            }
-
-            // support dotted paths
-            var parts = key.split(".");
-            var value = entity;
-            $.each(parts, function (index, part) {
-                validateKeyMember(part, key, value, entityType);
-                value = observability.getProperty(value, part);
-            });
-
-            identity += value;
-        });
-        return identity;
-    }
-    function validateKeyMember(keyMember, fullKey, entity, entityType) {
-        if (!entity || !(keyMember in entity)) {
-            throw "Key member '" + fullKey + "' doesn't exist on entity type '" + entityType + "'";
-        }
-    }
 
 
 

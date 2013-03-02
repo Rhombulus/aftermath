@@ -12,14 +12,9 @@ var aftermath;
                 _super.apply(this, arguments);
 
             }
-            DescendingUnarySortExpression.prototype.getFunction = function () {
-                var ascFunction = _super.prototype.getFunction.call(this);
-                return function (a, b) {
-                    return ascFunction(a, b) * -1;
-                };
+            DescendingUnarySortExpression.prototype.invoke = function (a, b) {
             };
             DescendingUnarySortExpression.prototype.getQueryString = function () {
-                return _super.prototype.getQueryString.call(this) + ' desc';
             };
             return DescendingUnarySortExpression;
         })(expressions.UnarySortExpression);

@@ -24,17 +24,13 @@ module aftermath.dbDataProvider {
 
     }
 
-    export function request(rootUri: string, operationName: string, filter: string, sort: string): JQueryPromise {
+    export function request(rootUri: string, operationName: string, query: string): JQueryPromise {
 
-        var url = normalizeUrl(rootUri) + operationName;
-        var data = <any>{};
-
-        filter && (data.$filter = filter);
-        sort && (data.$orderby = sort);
+        var url = normalizeUrl(rootUri) + operationName + '?' + query;
+       
 
         var options = <JQueryAjaxSettings>{
             url: url,
-            data: data,
             dataType: 'json'
         };
    
@@ -48,16 +44,6 @@ module aftermath.dbDataProvider {
         return def.promise();
     }
 
-    var inProgress = {};
-    function trafficCop(options: JQueryAjaxSettings) {
-        var key = JSON.stringify(options);
-        if (inProgress[key]) {
-            console.info('from cache', key);
-        } else {
-            inProgress[key] = $.ajax(options).always(() => setTimeout(() => delete inProgress[key], 120000));
-        }
-        return inProgress[key];
-    };
 
     function normalizeUrl(url: string) {
         /// ensures the url has a trailing slash

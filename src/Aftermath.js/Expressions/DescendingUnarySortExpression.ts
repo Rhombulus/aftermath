@@ -5,12 +5,14 @@
 module aftermath.expressions {
 
     export class DescendingUnarySortExpression extends UnarySortExpression {
-        getFunction() {
-            var ascFunction = super.getFunction();
-            return (a, b) => ascFunction(a, b) * -1;
+        //constructor(orderBy: Expression) {
+        //    super(orderBy);
+        //}
+        invoke(a, b) {
+            //return -super.invoke(a, b);
         }
         getQueryString() {
-            return super.getQueryString() + ' desc';
+            //return super.getQueryString() + ' desc';
         }
     }
 }

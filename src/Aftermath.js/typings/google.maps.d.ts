@@ -985,7 +985,7 @@ declare module google.maps {
         constructor (url: string, opts?: KmlLayerOptions);
         getDefaultViewport(): LatLngBounds;
         getMap(): Map;
-        getmetadata: KmlLayerMetadata;
+        getMetadata(): KmlLayerMetadata;
         getStatus(): KmlLayerStatus;
         getUrl(): string;
         setMap(map: Map): void;
@@ -1165,8 +1165,7 @@ declare module google.maps {
         lng(): number;
         toString(): string;
         toUrlValue(precision?: number): string;
-        
-        distanceTo(latlng: LatLng): number;
+
     }
 
     export class LatLngBounds {

@@ -1,0 +1,51 @@
+var aftermath;
+(function (aftermath) {
+    (function (expressions) {
+        (function (nodeType) {
+            nodeType._map = [];
+            nodeType._map[0] = "identifier";
+            nodeType.identifier = 0;
+            nodeType._map[1] = "add";
+            nodeType.add = 1;
+            nodeType._map[2] = "and";
+            nodeType.and = 2;
+            nodeType._map[3] = "divide";
+            nodeType.divide = 3;
+            nodeType._map[4] = "equal";
+            nodeType.equal = 4;
+            nodeType._map[5] = "greaterThan";
+            nodeType.greaterThan = 5;
+            nodeType._map[6] = "greaterThanOrEqual";
+            nodeType.greaterThanOrEqual = 6;
+            nodeType._map[7] = "lambda";
+            nodeType.lambda = 7;
+            nodeType._map[8] = "lessThan";
+            nodeType.lessThan = 8;
+            nodeType._map[9] = "lessThanOrEqual";
+            nodeType.lessThanOrEqual = 9;
+            nodeType._map[10] = "memberAccess";
+            nodeType.memberAccess = 10;
+            nodeType._map[11] = "modulo";
+            nodeType.modulo = 11;
+            nodeType._map[12] = "multiply";
+            nodeType.multiply = 12;
+            nodeType._map[13] = "negate";
+            nodeType.negate = 13;
+            nodeType._map[14] = "not";
+            nodeType.not = 14;
+            nodeType._map[15] = "notEqual";
+            nodeType.notEqual = 15;
+            nodeType._map[16] = "or";
+            nodeType.or = 16;
+            nodeType._map[17] = "parameter";
+            nodeType.parameter = 17;
+            nodeType._map[18] = "power";
+            nodeType.power = 18;
+            nodeType._map[19] = "subtract";
+            nodeType.subtract = 19;
+        })(expressions.nodeType || (expressions.nodeType = {}));
+        var nodeType = expressions.nodeType;
+    })(aftermath.expressions || (aftermath.expressions = {}));
+    var expressions = aftermath.expressions;
+})(aftermath || (aftermath = {}));
+//@ sourceMappingURL=ExpressionType.js.map

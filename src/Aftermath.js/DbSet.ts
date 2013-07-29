@@ -1,23 +1,28 @@
-/// <reference path="aftermath.ts" />
+/// <reference path="Expressions/DescendingUnarySortExpression.ts" />
+/// <reference path="Expressions/UnarySortExpression.ts" />
+/// <reference path="DbQuery.ts" />
+/// <reference path="Expressions/MemberExpression.ts" />
 
 
 
 module aftermath {
+    export interface MemberSelector { (memberName: string): expressions.MemberExpression; }
 
+     
 
     //! abstract
-    export class DbSet {
+    export class DbSet<TEntity> {
 
         /** @constructor */
         constructor() { }
 
         /** @expose */
-        getEntities(): KnockoutObservableArray {
+        getEntities(): KnockoutObservableArray<TEntity> {
             throw 'abstract';
         }
 
         /** @protected */
-        _getEntities(): KnockoutObservableArray {
+        _getEntities(): KnockoutObservableArray<TEntity> {
             throw 'abstract';
         }
 
@@ -46,11 +51,11 @@ module aftermath {
         }
 
         /** @expose */
-        where(expressionSelector: ExpressionSelector): DbSet {
+        where(expressionSelector: ExpressionSelector): DbSet<TEntity> {
             return new DbQuery(this, expressionSelector(MemberSelector));
         }
         /** @expose */
-        first(expressionSelector: ExpressionSelector): KnockoutObservableAny {
+        first(expressionSelector: ExpressionSelector): KnockoutObservable<TEntity> {
             var expressedSet = (expressionSelector ? this.where(expressionSelector) : this).getEntities();
             return ko.computed({
                 read: () => expressedSet()[0],
@@ -67,7 +72,7 @@ module aftermath {
         }
 
         /** @expose */
-        select(expressionSelector: (entity) => any): KnockoutComputed {
+        select<TResult>(expressionSelector: (entity) => TResult): KnockoutComputed<TResult> {
             var entities = this.getEntities(); 
 
             return ko.computed({

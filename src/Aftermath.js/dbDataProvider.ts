@@ -1,4 +1,4 @@
-/// <reference path="aftermath.ts" />
+/// <reference path="typings/jquery.d.ts" />
 
 
 module aftermath.dbDataProvider {

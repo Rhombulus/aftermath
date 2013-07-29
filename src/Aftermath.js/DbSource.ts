@@ -1,11 +1,15 @@
-/// <reference path="aftermath.ts" />
-
+/// <reference path="typings/knockout.d.ts" />
+/// <reference path="Expressions/SortExpression.ts" />
+/// <reference path="Expressions/Expression.ts" />
+/// <reference path="typings/jquery.d.ts" />
+/// <reference path="DbContext.ts" />
+/// <reference path="DbSet.ts" />
 
 
 module aftermath {
-    export class DbSource extends DbSet {
+    export class DbSource<TEntity> extends DbSet<TEntity> {
         
-        _entities = ko.observableArray([]);
+        _entities = ko.observableArray<TEntity>([]);
 
         
         /**
@@ -21,8 +25,8 @@ module aftermath {
             return this._getEntities();
         }
 
-        _getEntities(): KnockoutObservableArray {
-            return this._entities
+        _getEntities(): KnockoutObservableArray<TEntity> {
+            return this._entities;
         }
          
         /**

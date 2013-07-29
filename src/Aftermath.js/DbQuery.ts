@@ -1,21 +1,23 @@
-/// <reference path="aftermath.ts" />
+/// <reference path="typings/knockout.d.ts" />
+/// <reference path="Expressions/SortExpression.ts" />
+/// <reference path="DbSet.ts" />
 
 
 
 module aftermath {
 
-    export class DbQuery extends DbSet {
+    export class DbQuery<TEntity> extends DbSet<TEntity> {
 
 
         /**
           * @constructor
           */
-        constructor(public _querySource: DbSet, public _filter: expressions.Expression, public _sort?: expressions.SortExpression) {
+        constructor(public _querySource: DbSet<TEntity>, public _filter: expressions.Expression, public _sort?: expressions.SortExpression) {
             super();
         }
 
         /** @expose */
-        getEntities() : KnockoutObservableArray {
+        getEntities(): KnockoutObservableArray<TEntity> {
             var entities = this._getEntities();
 
 
@@ -34,7 +36,7 @@ module aftermath {
                 },
                 deferEvaluation: true
             });
-            var computedSet = ko.computed({
+            var computedSet = ko.computed<TEntity>({
                 read: () => {
                     var query = computedQuery();
                     var result = entities();
@@ -55,12 +57,12 @@ module aftermath {
                 deferEvaluation: true
             });
 
-            return <KnockoutObservableArray>$.extend(computedSet, ko.observableArray.fn);;
+            return <KnockoutObservableArray<TEntity>>$.extend(computedSet, ko.observableArray.fn);;
 
 
         }
         /** @protected */
-        _getEntities(): KnockoutObservableArray {
+        _getEntities(): KnockoutObservableArray<TEntity> {
             return this._querySource._getEntities();
         }
 

@@ -1,4 +1,6 @@
-/// <reference path="_reference.ts" />
+/// <reference path="../utils.ts" />
+/// <reference path="../Observability.ts" />
+/// <reference path="Expression.ts" />
 
 
 module aftermath.expressions {

@@ -1,4 +1,4 @@
-/// <reference path="_reference.ts" />
+/// <reference path="Expression.ts" />
 
 
 module aftermath.expressions {

@@ -1,8 +1,9 @@
-/// <reference path="_reference.ts" />
+/// <reference path="BinaryOperator.d.ts" />
+/// <reference path="../typings/google.maps.d.ts" />
+/// <reference path="../utils.ts" />
 
 
 module aftermath.expressions.operators {
-
     var undefined;
     export var equal: BinaryOperator = {
         operation: (left, right) => left == right,

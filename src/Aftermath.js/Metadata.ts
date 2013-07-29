@@ -1,39 +1,72 @@
-/// <reference path="aftermath.ts" />
+/// <reference path="utils.ts" />
+/// <reference path="typings/jquery.d.ts" />
 
 
 
 module aftermath {
-    
 
     export module metadata {
+        
+        export interface MetadataSet { [entityType: string]: Metadata; }
 
-       
-         
+        export interface ValidationRuleMetaData {
+            rules: { [fieldName: string]: RuleMetadata; };
+            messages: { [whatisthis: string]: any; };
+        }
+        export interface Metadata extends ValidationRuleMetaData {
+            fields: { [field: string]: FieldMetadata; };
+            key: string[];
+            shortName: string;
+        }
+        export interface FieldMetadata {
+            type?: string;
+            array?: bool;
+            association?: AssociationMetadata;
+            readonly?: bool;
+
+            name?: string;
+        }
+        export interface AssociationMetadata {
+            name: string;
+            thisKey: string[];
+            otherKey: string[];
+            isForeignKey: bool;
+        }
+        export interface RuleMetadata {
+            maxlength?: number;
+            required?: bool;
+        }
+
+        
+        
         var _metadata: MetadataSet = {};
-        export function peek() { 
+        export function peek() {
             return _metadata;
         }
         export function process(): MetadataSet;
         export function process(entityType: string): Metadata;
-        export function process(entityType: string, newMetaData: Metadata): void;
-        export function process(newMetaData: MetadataSet): void;
-        export function process(entityType? , any? ) {
-            if (arguments.length === 0) {
-                return $.extend({}, metadata);
-            } else if (typeof entityType === "string") {
+        export function process(entityType: string, newMetaData: Metadata): Metadata;
+        export function process(newMetaData: MetadataSet): MetadataSet;
+        export function process(entityType?, any?):any {
+            if (arguments.length === 0) {//MetadataSet
+                return $.extend({}, _metadata);
+
+            } else if (typeof entityType === "string") {//Metadata
                 if (arguments.length === 1) {
                     return _metadata[entityType];
                 } else {
                     if (!_metadata[entityType]) {
                         _metadata[entityType] = arguments[1];
                     }
+                    return _metadata[entityType];
                     // ...else assume the new metadata is the same as that previously registered for entityType.
                 }
             } else {
 
                 $.each(entityType, (entityType, meta) =>
                     process(entityType, meta)
-                );
+                    );
+                return $.extend({}, _metadata);
             }
         }
 
@@ -43,7 +76,7 @@ module aftermath {
         }
 
         //TODO: dead parameter -- entity
-        export function getProperties(entity: Entity, entityType: string, includeAssocations = false) {
+        export function getProperties(entity: any, entityType: string, includeAssocations = false) {
             var props: FieldMetadata[] = [];
             if (entityType) {
                 var metadata = _metadata[entityType];
@@ -97,9 +130,9 @@ module aftermath {
         };
     }
 
-    var types: { [type: string]: Func[]; } = {};
+    var types: { [type: string]: { (): any; }[]; } = {};
 
-    export function registerType(type, keyFunction): aftermath {
+    export function registerType(type, keyFunction) {
         /// <summary>
         /// Registers a type string for later access with a key.  This facility is convenient to avoid duplicate type string literals throughout your application scripts.  The key is expected to be returned by 'keyFunction', allowing the call to 'registerType' to precede the line of JavaScript declaring the key.  Typically, the returned key will be a constructor function for a JavaScript class corresponding to 'type'.
         /// </summary>

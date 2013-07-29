@@ -1,4 +1,5 @@
-/// <reference path="aftermath.ts" />
+/// <reference path="Metadata.ts" />
+/// <reference path="typings/knockout.d.ts" />
 
 
 
@@ -14,9 +15,9 @@ module aftermath {
 
     export class DbMetadata {
 
-        _types: { [entityType: string]: Ctor0; } = {};
+        _types: { [entityType: string]: new()=>void; } = {};
 
-        constructor(public metadata: MetadataSet) {
+        constructor(public metadata: metadata.MetadataSet) {
         }
 
         createType(entityType: string) {
@@ -44,7 +45,7 @@ module aftermath {
 
         var backingProp = '_' + prop;
 
-        var observable = <KnockoutObservableAny>function () {
+        var observable = <KnockoutObservable>function () {
             observable.peek = ()=> this[backingProp] ;
             observable.valueHasMutated = function () { observable["notifySubscribers"](this[backingProp]); }
             observable.valueWillMutate = function () { observable["notifySubscribers"](this[backingProp], "beforeChange"); }

@@ -1,4 +1,9 @@
-/// <reference path="_reference.ts" />
+/// <reference path="BinaryOperator.d.ts" />
+/// <reference path="BinaryOperator.d.ts" />
+/// <reference path="BinaryOperator.d.ts" />
+/// <reference path="operators.ts" />
+/// <reference path="BinaryExpression.ts" />
+/// <reference path="operators.ts" />
 
 
 module aftermath.expressions {

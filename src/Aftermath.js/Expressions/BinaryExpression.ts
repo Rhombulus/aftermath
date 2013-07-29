@@ -1,4 +1,7 @@
-/// <reference path="_reference.ts" />
+/// <reference path="ConstantExpression.ts" />
+/// <reference path="BinaryOperator.d.ts" />
+/// <reference path="Expression.ts" />
+/// <reference path="PredicateExpression.ts" />
 
 module aftermath.expressions {
 

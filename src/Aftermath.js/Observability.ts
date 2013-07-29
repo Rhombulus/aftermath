@@ -1,4 +1,6 @@
-/// <reference path="aftermath.ts" />
+/// <reference path="Metadata.ts" />
+/// <reference path="DbContext.ts" />
+/// <reference path="typings/knockout.d.ts" />
 
 
 module aftermath.observability {
@@ -30,7 +32,7 @@ module aftermath.observability {
             return ko.isObservable(item[name]) ? item[name](value) : item[name] = value;
         }
 
-        export function asArray(collection: KnockoutObservableArray): any[] {
+        export function asArray<T>(collection: KnockoutObservableArray<T>): T[] {
             return collection();
         }
 
@@ -51,7 +53,7 @@ module aftermath.observability {
             if (utils.isObject(item)) {
                 var obj = {};
 
-                ko.utils.arrayForEach(aftermath.metadata.getProperties(item, type, true), (prop: FieldMetadata) => {
+                ko.utils.arrayForEach(aftermath.metadata.getProperties(item, type, true), (prop: metadata.FieldMetadata) => {
                     var value = dbContext.map(item[prop.name], prop.type);
                     obj[prop.name] = ko.isObservable(value) ? value : ko.observable(value);
                 });

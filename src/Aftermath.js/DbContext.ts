@@ -1,4 +1,6 @@
-/// <reference path="aftermath.ts" />
+/// <reference path="dbDataProvider.ts" />
+/// <reference path="DbSource.ts" />
+/// <reference path="Metadata.ts" />
 
 
 
@@ -6,7 +8,7 @@ module aftermath {
 
     export class DbContext {
         public _dbSets: { [entityType: string]: DbSource; } = {};
-        public _mappings: { [entityType: string]: Ctor0; } = {};
+        public _mappings: { [entityType: string]: new()=>void; } = {};
         public _actions: {
             [entityType: string]: {
                 [action: string]: {
@@ -59,19 +61,19 @@ module aftermath {
                 .promise();
         }
 
-        addMapping(entityType: string, entityCtor: Ctor0) {
+        addMapping(entityType: string, entityCtor: new()=>void) {
             this._mappings[entityType] = entityCtor;
         }
 
         /** @expose */
-        getDbSet(entityType: string): DbSet;
-        getDbSet(entityType: { entityType: string; new (); }): DbSet;
-        getDbSet(entityType): DbSet {
-            return this._getDbSource(entityType);
+        getDbSet<TEntity>(entityType: string): DbSet<TEntity>;
+        getDbSet<TEntity>(entityType: { entityType: string; new (); }): DbSet<TEntity>;
+        getDbSet<TEntity>(entityType): DbSet<TEntity> {
+            return this._getDbSource<TEntity>(entityType);
         }
 
         /** @private */
-        _getDbSource(entityType): DbSource {
+        _getDbSource<TEntity>(entityType): DbSource<TEntity> {
             var type = entityType['entityType'];
             if (type) {
                 this.addMapping(type, entityType);
@@ -80,7 +82,7 @@ module aftermath {
             }
 
             var operationName = metadata.getOperationName(type);
-            return this._dbSets[type] || (this._dbSets[type] = new DbSource(this, type, operationName));
+            return this._dbSets[type] || (this._dbSets[type] = new DbSource<TEntity>(this, type, operationName));
 
         }
 
@@ -161,7 +163,7 @@ module aftermath {
 
         var properties = metadata.getProperties(entity, entityType, true);
         for (var i in properties) {
-            var propertyInfo: FieldMetadata = properties[i];
+            var propertyInfo: metadata.FieldMetadata = properties[i];
 
             var propertyValue = ko.utils.unwrapObservable(entity[propertyInfo.name]);
 
